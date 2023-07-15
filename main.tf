@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MPL-2.0
 
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
+  profile = "nibiru"
 
   default_tags {
     tags = {
@@ -22,6 +23,17 @@ resource "aws_s3_bucket" "lambda_bucket" {
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket     = aws_s3_bucket.lambda_bucket.id
+  acl        = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.s3_bucket_acl_ownership]
+}
+
+# Resource to avoid error "AccessControlListNotSupported: The bucket does not allow ACLs"
+# Error AccessControlListNotSupported when trying to create a bucket ACL in AWS
+# https://stackoverflow.com/questions/76049290/error-accesscontrollistnotsupported-when-trying-to-create-a-bucket-acl-in-aws
+resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
   bucket = aws_s3_bucket.lambda_bucket.id
-  acl    = "private"
+  rule {
+    object_ownership = "ObjectWriter"
+  }
 }
