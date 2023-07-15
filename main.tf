@@ -55,7 +55,7 @@ resource "aws_s3_object" "lambda_hello_world" {
 }
 
 resource "aws_lambda_function" "hello_world" {
-  function_name = "HelloWorld"
+  function_name = "HelloWorldTerraform"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda_hello_world.key
